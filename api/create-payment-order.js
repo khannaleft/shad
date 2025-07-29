@@ -1,31 +1,53 @@
-const axios = require('axios');
+// File: /api/create-payment-order.ts
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import axios from 'axios';
 
-module.exports = async (req, res) => {
+/**
+ * This is a Vercel Serverless Function that acts as a secure backend.
+ * It creates a payment order with Cashfree by using secret credentials
+ * stored as Environment Variables on Vercel.
+ */
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse,
+) {
   console.log('API Function: Received request.');
 
+  // Only allow POST requests
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).end('Method Not Allowed');
   }
 
-  // 👇 Log the incoming request body
-  console.log('Request Body:', req.body);
-
+  // Read credentials and API URL from Vercel Environment Variables.
   const CASHFREE_APP_ID = process.env.CASHFREE_APP_ID;
   const CASHFREE_SECRET_KEY = process.env.CASHFREE_SECRET_KEY;
   const CASHFREE_API_URL = process.env.CASHFREE_API_URL || 'https://sandbox.cashfree.com/pg/orders';
 
+
+  // Ensure server is configured correctly
   if (!CASHFREE_APP_ID || !CASHFREE_SECRET_KEY) {
+    console.error('API Function: Server configuration error - API keys are not set.');
     return res.status(500).json({ message: 'Server configuration error: API keys are not set.' });
   }
 
   try {
+    // Vercel automatically parses the JSON body for us
     const { name, email, phone, amount } = req.body;
+    console.log('API Function: Processing payment for:', { name, email, phone, amount });
 
+    // Basic validation
     if (!name || !email || !phone || !amount || amount <= 0) {
-      return res.status(400).json({ message: 'Invalid input' });
+      return res.status(400).json({ message: 'Invalid input. All fields are required and amount must be positive.' });
     }
+    
+    // Dynamically construct the return_url using Vercel's environment variables.
+    // This makes the app work seamlessly in preview and production environments.
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : 'https://your-frontend-domain.vercel.app'; // Fallback to a placeholder
 
+    // Prepare the order payload for Cashfree
     const orderId = `ORDER_${Date.now()}`;
     const requestData = {
       order_id: orderId,
@@ -38,26 +60,42 @@ module.exports = async (req, res) => {
         customer_phone: phone,
       },
       order_meta: {
-        return_url: `https://shad-indol.vercel.app/status?order_id={order_id}`,
+        // Cashfree will redirect to this URL after payment. Pointing to the root
+        // to avoid 404s as there's no specific status page in the current SPA.
+        return_url: `${baseUrl}/?order_id={order_id}`,
       },
-      order_note: 'Dental service payment',
+      order_note: 'Dental service payment'
     };
 
-    const response = await axios.post(CASHFREE_API_URL, requestData, {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-client-id': CASHFREE_APP_ID,
-        'x-secret-key': CASHFREE_SECRET_KEY,
-        'x-api-version': '2022-09-01',
-      },
-    });
+    console.log('API Function: Making request to Cashfree at', CASHFREE_API_URL);
+    // Make the secure, server-to-server call to Cashfree using axios
+    const response = await axios.post(
+      CASHFREE_API_URL, 
+      requestData, 
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-client-id': CASHFREE_APP_ID,
+          'x-secret-key': CASHFREE_SECRET_KEY,
+          'x-api-version': '2023-08-01', // Updated to latest recommended version to fix auth issues.
+        },
+      }
+    );
 
+    // Success! Send the session ID back to the frontend.
+    console.log('API Function: Successfully created payment session.');
     res.status(200).json({ payment_session_id: response.data.payment_session_id });
+
   } catch (error) {
+    console.error('API Function: Full error object:', error);
+    
+    // Forward the specific error from Cashfree if available
     if (axios.isAxiosError(error) && error.response) {
+      console.error('API Function: Error from Cashfree:', error.response.data);
       return res.status(error.response.status).json(error.response.data);
     }
-
-    res.status(500).json({ message: 'Internal server error', error: error.message });
+    
+    // Otherwise, send a generic internal server error
+    res.status(500).json({ message: 'An internal error occurred while creating the payment session.' });
   }
-};
+}
