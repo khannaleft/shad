@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
 
   const CASHFREE_APP_ID = process.env.CASHFREE_APP_ID;
   const CASHFREE_SECRET_KEY = process.env.CASHFREE_SECRET_KEY;
-  const CASHFREE_API_URL = process.env.CASHFREE_API_URL || 'https://sandbox.cashfree.com/pg/orders';
+  const CASHFREE_API_URL = process.env.CASHFREE_API_URL;
 
   if (!CASHFREE_APP_ID || !CASHFREE_SECRET_KEY) {
     return res.status(500).json({ message: 'Server configuration error: API keys are not set.' });
