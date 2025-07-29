@@ -1,10 +1,3 @@
-// File: /api/create-payment-order.ts (or .js if easier)
-const axios = require('axios');
-
-/**
- * @param {import('@vercel/node').VercelRequest} req
- * @param {import('@vercel/node').VercelResponse} res
- */
 module.exports = async (req, res) => {
   console.log('API Function: Received request.');
 
@@ -13,9 +6,12 @@ module.exports = async (req, res) => {
     return res.status(405).end('Method Not Allowed');
   }
 
+  // 👇 Log the incoming request body
+  console.log('Request Body:', req.body);
+
   const CASHFREE_APP_ID = process.env.CASHFREE_APP_ID;
   const CASHFREE_SECRET_KEY = process.env.CASHFREE_SECRET_KEY;
-  const CASHFREE_API_URL = process.env.CASHFREE_API_URL;
+  const CASHFREE_API_URL = process.env.CASHFREE_API_URL || 'https://sandbox.cashfree.com/pg/orders';
 
   if (!CASHFREE_APP_ID || !CASHFREE_SECRET_KEY) {
     return res.status(500).json({ message: 'Server configuration error: API keys are not set.' });
