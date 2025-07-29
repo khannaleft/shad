@@ -1,0 +1,23 @@
+{
+  "name": "shade-dentistry-vercel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frontend and Vercel Functions for Shade Dentistry",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@vercel/node": "^3.0.27",
+    "typescript": "^5.4.5",
+    "vite": "^7.0.6",
+    "@vitejs/plugin-react": "^4.2.1"
+  }
+}

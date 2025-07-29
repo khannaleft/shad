@@ -1,0 +1,6 @@
+
+{
+  "name": "Shade Dentistry Payments",
+  "description": "A modern web application for a dental clinic to showcase services and accept online payments securely via the Cashfree payment gateway. Patients can view services, book appointments, and pay fees online.",
+  "requestFramePermissions": []
+}
