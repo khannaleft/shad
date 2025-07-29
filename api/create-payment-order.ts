@@ -55,7 +55,7 @@ export default async function handler(
       },
       order_meta: {
         // IMPORTANT: Update this with your frontend's domain once deployed.
-        return_url: `https://your-frontend-domain.vercel.app/status?order_id={order_id}`,
+        return_url: `https://shad-indol.vercel.app//status?order_id={order_id}`,
       },
       order_note: 'Dental service payment'
     };
