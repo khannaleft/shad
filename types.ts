@@ -28,3 +28,25 @@ export interface PaymentStatus {
   message: string;
   transactionId?: string;
 }
+
+// src/types/types.ts
+
+export interface PaymentOrderRequest {
+  name: string;
+  email: string;
+  phone: string;
+  amount: number;
+}
+
+export interface PayUOrderResponse {
+  key: string;
+  txnid: string;
+  amount: string;
+  productinfo: string;
+  firstname: string;
+  email: string;
+  phone: string;
+  surl: string;
+  furl: string;
+  hash: string;
+}
