@@ -2,7 +2,7 @@
 
 import { PaymentOrderRequest, PayUOrderResponse } from '../types/types';
 
-export const createPayUOrder = async (
+export const createPayuOrder = async (
   paymentDetails: PaymentOrderRequest
 ): Promise<PayUOrderResponse> => {
   const response = await fetch('/api/create-payment-order', {
