@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { DENTAL_SERVICES } from '../constants';
 import type { Service, PatientDetails, PaymentStatus } from '../types';
 import { PaymentStatusState } from '../types';
-import { createPayuHash } from '../services/payuService';
+import { createPayuOrder } from '../services/payuService';
 import { PaymentStatusModal } from './PaymentStatusModal';
 
 declare global {
@@ -106,7 +106,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ini
         productinfo: 'Dental Service',
       };
 
-      const data = await createPayuHash(payload);
+      const data = await createPayuOrder(payload);
 
       const bolt = window.bolt;
 
